@@ -1,4 +1,6 @@
-﻿namespace Escape_Room_Kevin
+﻿using Microsoft.VisualBasic;
+
+namespace Escape_Room_Kevin
 {
     internal class Program
     {
@@ -38,13 +40,23 @@
 
         static void Main(string[] args)
         {
+
             WelcomeMessage();
             CustomMapCreation();
             InitializeRoom();
             PlacePlayer();
             PlaceKey();
             PlaceDoor();
+            DateTime timeStart = DateAndTime.Now;
             GameCompleted();
+            WinningMessage();
+            Time();
+
+            DateTime timeStop = DateAndTime.Now;
+
+            TimeSpan tmp = timeStop - timeStart;
+
+            Console.WriteLine(tmp);
         }
 
         #region Begrüßung | Anleitung | Tastenbelegung
@@ -149,6 +161,7 @@
                         {
                             Console.ForegroundColor = ConsoleColor.Green;
                             Console.Write("░░"); // Tür geöffnet
+                            
                         }
                         else
                         {
@@ -167,52 +180,6 @@
 
             Console.ForegroundColor = ConsoleColor.White;
         }
-
-        //
-        //     
-        //     {
-        //         for (int x = 0; x < roomWidth; x++)
-        //         {
-        //             if (x == playerX && y == playerY)
-        //             {
-        //                 Console.ForegroundColor = ConsoleColor.Green;
-        //                 Console.Write('P'); // Player
-        //             }
-        //             else if (x == keyX && y == keyY)
-        //             {
-        //                 if (!hasKey)
-        //                 {
-        //                     Console.ForegroundColor = ConsoleColor.Yellow;
-        //                     Console.Write('K'); // Schlüssel
-        //                 }
-        //                 else
-        //                 {
-        //                     Console.Write('.'); // Schlüssel eingesammelt
-        //                 }
-        //             }
-        //             else if (x == doorX && y == doorY)
-        //             {
-        //                 if (hasKey)
-        //                 {
-        //                     Console.ForegroundColor = ConsoleColor.Red;
-        //                     Console.Write('D'); // Tür geoffnet
-        //                 }
-        //                 else
-        //                 {
-        //                     Console.Write('#'); // Verschlossene Tür
-        //                 }
-        //             }
-        //             else
-        //             {
-        //                 Console.ForegroundColor = ConsoleColor.White;
-        //                 Console.Write(map[x, y]); // Boden oder Wand
-        //             }
-        //         }
-        //         Console.WriteLine();
-        //     }
-        // 
-        //     Console.ForegroundColor = ConsoleColor.White;
-        // }
 
         #endregion
 
@@ -294,8 +261,6 @@
             }
 
             return true;
-
-            // return x >= 0 && x < roomWidth && y >= 0 && y < roomHeight && map[x, y] != "#";
         }
 
         static void MovePlayer(int x, int y)
@@ -356,6 +321,8 @@
                     doorY = rnd.Next(1, roomHeight - 1);
                     break;
             }
+
+            map[doorX, doorY] = "░░";
         }
 
         #endregion
@@ -371,7 +338,8 @@
             Console.Clear();
             DrawRoom();
             Console.Clear();
-            Console.WriteLine("Gluckwunsch! Du hast die Tür geöffnet und konntest den Raum verlassen!");
+            Console.WriteLine("Glückwunsch! Du hast die Tür geöffnet und konntest den Raum verlassen!");
+            Console.ReadKey();
         }
 
         #endregion
@@ -385,7 +353,7 @@
 
         #endregion
 
-        #region Funktion Wenn das Spiel abgeschlossen wurde.
+        #region Wenn das Spiel beendet wird
 
         static void GameCompleted()
         {
