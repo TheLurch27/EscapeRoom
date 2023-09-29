@@ -27,6 +27,10 @@ namespace Escape_Room_Kevin
         // Game Mechanik
         static bool isGameFinished = false;
 
+        // Spieler Name
+        static string playerName;
+
+
         #endregion
 
         #region Zeichen (Unwichtig)
@@ -38,26 +42,58 @@ namespace Escape_Room_Kevin
 
         #endregion
 
+        #region Ranking
+
+        private static List<PlayerInfo> playerRanking = new List<PlayerInfo>();
+
+        #endregion
+
         static void Main(string[] args)
         {
 
             WelcomeMessage();
+            playerCounter();
+            NameDeclaration();
             CustomMapCreation();
             InitializeRoom();
             PlacePlayer();
             PlaceKey();
             PlaceDoor();
-            DateTime timeStart = DateAndTime.Now;
+            DateTime timeStart = DateAndTime.Now; // Spielzeitmessung gestartet
             GameCompleted();
             WinningMessage();
-            Time();
+            PlayerRanking();
+            DateTime timeStop = DateAndTime.Now; // Spielzeitmessung beenden
 
-            DateTime timeStop = DateAndTime.Now;
+            TimeSpan tmp = CalculateElapsedTime(timeStart); // Berechnet die gespielte Zeit
 
-            TimeSpan tmp = timeStop - timeStart;
+            Console.WriteLine("Du hast " + tmp + " gebraucht.");  // Zeigt die gespielte Zeit an
+            
 
-            Console.WriteLine(tmp);
+            PlayerInfo currentPlayer = new PlayerInfo // Hier wird die Spielerinformation erstellt und zur Liste hinzugefügt
+            {
+                Name = playerName,
+                Time = tmp // Die berechnete Spielzeit
+            };
+            playerRanking.Add(currentPlayer);
+
+            playerRanking.Sort((x, y) => x.Time.CompareTo(y.Time)); // Spieler-Ranking nach Spielzeit sortieren
+
+            // Zeige das Spieler-Ranking an
+            Console.WriteLine("Sieh dir die Aktuelle Rangliste an: ");
+            Console.WriteLine();
+            Console.WriteLine("1 = " + playerRanking[0].Name + " mit einer Zeit von " + playerRanking[0].Time);
+            Console.WriteLine("2 = " + playerRanking[1].Name + " mit einer Zeit von " + playerRanking[1].Time);
+            Console.WriteLine("3 = " + playerRanking[2].Name + " mit einer Zeit von " + playerRanking[2].Time);
         }
+
+
+
+        // Console.WriteLine("Rangliste:");
+        //     for (int i = 0; i < playerRanking.Count; i++)
+        //     {
+        //         Console.WriteLine($"{i + 1}: {playerRanking[i].Name} - {playerRanking[i].Time}");
+        //     }
 
         #region Begrüßung | Anleitung | Tastenbelegung
 
@@ -88,6 +124,124 @@ namespace Escape_Room_Kevin
         }
 
         #endregion
+
+        #region Anzahl der Spieler
+
+        static void playerCounter()
+        {
+            Console.Write("Geben Sie die Anzahl der Spieler ein (max. 1-4): ");
+            int numberOfPlayers = Convert.ToInt32(Console.ReadLine());
+
+            if (numberOfPlayers < 1 || numberOfPlayers > 4)
+            {
+                Console.WriteLine("Ungültige Anzahl von Spielern. Das Spiel wird beendet.");
+                return;
+            }
+
+            // Schleife für jeden Spieler
+            for (int playerNumber = 1; playerNumber <= numberOfPlayers; playerNumber++)
+            {
+                // Frage nach dem Spielername
+                Console.Write("Spieler " + playerNumber + ", gib deinen Namen ein: ");
+                string playerName = Console.ReadLine();
+
+                // Eingabe der Raumgröße
+                CustomMapCreation();
+
+                // Initialisierung des Raums
+                InitializeRoom();
+
+                // Platzieren des Spielers, Schlüssels und der Tür
+                PlacePlayer();
+                PlaceKey();
+                PlaceDoor();
+
+                // Spielzeitmessung starten
+                DateTime timeStart = DateAndTime.Now;
+
+                // Hauptspiel
+                GameCompleted();
+
+                // Spieler hat das Spiel beendet
+                WinningMessage();
+
+                // Spielzeitmessung beenden
+                DateTime timeStop = DateAndTime.Now;
+
+                // Berechne die gespielte Zeit
+                TimeSpan tmp = CalculateElapsedTime(timeStart);
+
+                // Zeige die gewonnene Zeit an
+                Console.WriteLine("Spieler " + playerNumber + " (" + playerName + ") hat " + tmp + " gebraucht.");
+                Console.ReadKey();
+                Console.Clear();
+
+                // Hier wird die Spielerinformation erstellt und zur Liste hinzugefügt
+                PlayerInfo currentPlayer = new PlayerInfo
+                {
+                    Name = playerName,
+                    Time = tmp // Die berechnete Spielzeit
+                };
+                playerRanking.Add(currentPlayer);
+            }
+
+        }
+
+        #endregion
+
+        #region Name eingeben
+
+        static void NameDeclaration()
+        {
+            List<PlayerInfo> playerRanking = new List<PlayerInfo>();
+
+            Console.Write("Gib deinen Namen ein: ");
+            string playerName = Console.ReadLine();
+        }
+
+        #endregion
+
+        #region Spielzeit berechnen
+
+        private static TimeSpan CalculateElapsedTime(DateTime startTime)
+        {
+            DateTime endTime = DateAndTime.Now;
+            TimeSpan elapsedTime = endTime - startTime;
+            return elapsedTime;
+        }
+
+        #endregion
+        #region zeigt spieler Ranking an
+
+        static void PlayerRanking()
+        {
+            Console.WriteLine("Spieler-Ranking:");
+            for (int i = 0; i < playerRanking.Count; i++)
+            {
+                Console.WriteLine((i + 1) + " = " + playerRanking[i].Name + " mit einer Zeit von " + playerRanking[i].Time);
+            }
+        }
+
+        #endregion
+
+        #region Spieler Info
+
+        public class PlayerInfo
+        {
+            public string Name { get; set; }
+            public TimeSpan Time { get; set; }
+        }
+
+        #endregion
+
+        // #region Zeit anzeige
+        // 
+        // static void Timer()
+        // {
+        //     Console.WriteLine("Du hast " + tmp + " gebraucht.");
+        //     Console.ReadKey();
+        //     Console.Clear();
+        // }
 
         #region Eingabe der Map Maße
 
@@ -338,8 +492,19 @@ namespace Escape_Room_Kevin
             Console.Clear();
             DrawRoom();
             Console.Clear();
-            Console.WriteLine("Glückwunsch! Du hast die Tür geöffnet und konntest den Raum verlassen!");
+            // Console.WriteLine("Glückwunsch! Du hast die Tür geöffnet und konntest den Raum verlassen!");
             Console.ReadKey();
+        }
+
+        #endregion
+
+        #region Gewinner Nachricht
+
+        static void WinningMessage()
+        {
+            Console.WriteLine("Herzlichen Glückwunsch! Du hast die Tür geöffnet und konntest den Raum verlassen!");
+            Console.ReadKey();
+            Console.Clear();
         }
 
         #endregion
