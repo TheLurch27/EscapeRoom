@@ -15,9 +15,15 @@ namespace Escape_Room_Kevin
         static int playerX;
         static int playerY;
 
+        static int playerResetX;
+        static int playerResetY;
+
         // Schlüssel
         static int keyX;
         static int keyY;
+        static int keyResetX;
+        static int keyResetY;
+
         static bool hasKey = false;
 
         // Tür
@@ -55,8 +61,16 @@ namespace Escape_Room_Kevin
         {
             WelcomeMessage();
             NumberOfPlayer();
-
             List<PlayerInfo> players = new List<PlayerInfo>();
+
+            CustomMapCreation(); // Abfrage der Map-Maße nur einmal am Anfang
+            InitializeRoom();
+            PlacePlayer();
+            PlaceKey();
+            PlaceDoor();
+
+
+
 
             for (int playerNumber = 1; playerNumber <= numberOfPlayer; playerNumber++)
             {
@@ -65,11 +79,6 @@ namespace Escape_Room_Kevin
 
                 NameDeclaration(playerNumber); // Übergeben des playerNumber-Parameters
 
-                CustomMapCreation(); // Abfrage der Map-Maße nur einmal am Anfang
-                InitializeRoom();
-                PlacePlayer();
-                PlaceKey();
-                PlaceDoor();
 
                 PlayerInfo currentPlayer = new PlayerInfo(PlayerName);
                 currentPlayer.StartTimer(); // Starte den Timer vor dem Spiel
@@ -85,11 +94,23 @@ namespace Escape_Room_Kevin
                 {
                     Console.WriteLine("Weiter zum nächsten Spieler. Drücken Sie eine Taste, um fortzufahren...");
                     Console.ReadKey();
+                    ResetGame();
                 }
             }
 
             // Scoreboard anzeigen und Spielergebnisse anzeigen
             PlayerRanking(players);
+        }
+
+        private static void ResetGame()
+        {
+            playerX = playerResetX;
+            playerY = playerResetY;
+            keyX = keyResetX;
+            keyY = keyResetY;
+
+            hasKey = false;
+            isGameFinished = false;
         }
 
 
@@ -181,7 +202,7 @@ namespace Escape_Room_Kevin
             // Zeige die Ergebnisse für jeden Spieler an
             for (int i = 0; i < players.Count; i++)
             {
-                Console.WriteLine($"Platz {i + 1}: {players[i].PlayerName} - Zeit: {players[i].ElapsedTime}");
+                Console.WriteLine($"Platz {i + 1}: {players[i].PlayerName} - Zeit: {players[i].ElapsedTime.ToString("mm':'ss'.'ff")}");
             }
 
             // Du kannst hier auch andere Informationen anzeigen, je nachdem, was du erfasst hast.
@@ -281,7 +302,7 @@ namespace Escape_Room_Kevin
                         {
                             Console.ForegroundColor = ConsoleColor.Green;
                             Console.Write("░░"); // Tür geöffnet
-                            
+
                         }
                         else
                         {
@@ -310,6 +331,9 @@ namespace Escape_Room_Kevin
             Random rnd = new Random();
             playerX = rnd.Next(1, roomWidth - 2);
             playerY = rnd.Next(1, roomHeight - 2);
+
+            playerResetX = playerX;
+            playerResetY = playerY;
         }
 
         #endregion
@@ -400,6 +424,9 @@ namespace Escape_Room_Kevin
             Random rnd = new Random();
             keyX = rnd.Next(1, roomWidth - 1);
             keyY = rnd.Next(1, roomHeight - 1);
+
+            keyResetX = keyX;
+            keyResetY = keyY;
         }
 
         #endregion
