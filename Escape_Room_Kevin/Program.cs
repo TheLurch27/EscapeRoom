@@ -6,177 +6,141 @@ namespace Escape_Room_Kevin
     {
         #region Deklaration
 
-        // Room
-        static int roomWidth;
-        static int roomHeight;
-        static string[,] map;
-
-        // Spieler
-        static int playerX;
-        static int playerY;
-
-        static int playerResetX;
-        static int playerResetY;
-
-        // Schlüssel
-        static int keyX;
-        static int keyY;
-        static int keyResetX;
-        static int keyResetY;
-
-        static bool hasKey = false;
-
-        // Tür
-        static int doorX;
-        static int doorY;
-
-        // Game Mechanik
-        static bool isGameFinished = false;
-
-        // Spieler Name
-        static string PlayerName;
-
-        //Player Anzahl
-        static int numberOfPlayer;
-
-
-        #endregion
-
-        #region Zeichen (Unwichtig)
-
-        string upArrow = "\u2191";
-        string downArrow = "\u2193";
-        string rightArrow = "\u2192";
-        string leftArrow = "\u2190";
-
-        #endregion
-
-        #region Spieler Liste
-
-        static List<PlayerInfo> players = new List<PlayerInfo>();
+        private static int roomWidth, roomHeight, playerX, playerY, playerResetX, playerResetY, keyX, keyY, keyResetX, keyResetY, doorX, doorY;
+        private static bool hasKey, isGameFinished;
+        private static string playerName = "";
+        private static int numberOfPlayers;
+        private static string[,] map;
+        private static List<PlayerInfo> players = new List<PlayerInfo>();
+        private static string upArrow = "\u2191", downArrow = "\u2193", rightArrow = "\u2192", leftArrow = "\u2190";
 
         #endregion
 
         static void Main(string[] args)
         {
             WelcomeMessage();
-            NumberOfPlayer();
-            List<PlayerInfo> players = new List<PlayerInfo>();
-
-            CustomMapCreation(); // Abfrage der Map-Maße nur einmal am Anfang
+            NumberOfPlayers();
+            CustomMapCreation();
             InitializeRoom();
             PlacePlayer();
             PlaceKey();
             PlaceDoor();
 
-
-
-
-            for (int playerNumber = 1; playerNumber <= numberOfPlayer; playerNumber++)
+            for (int playerNumber = 1; playerNumber <= numberOfPlayers; playerNumber++)
             {
                 Console.Clear();
-                Console.WriteLine($"Spieler {playerNumber}, es ist jetzt deine Runde.");
+                Console.WriteLine($"Player {playerNumber}, it's your turn.");
+                NameDeclaration(playerNumber);
 
-                NameDeclaration(playerNumber); // Übergeben des playerNumber-Parameters
+                PlayerInfo currentPlayer = new PlayerInfo(playerName);
+                currentPlayer.StartTimer();
 
-
-                PlayerInfo currentPlayer = new PlayerInfo(PlayerName);
-                currentPlayer.StartTimer(); // Starte den Timer vor dem Spiel
-
-                GameCompleted(currentPlayer); // Übergeben des aktuellen Spielers an die Methode
-                currentPlayer.StopTimer(); // Stoppe den Timer nach dem Spiel
-                currentPlayer.CalculateTime(); // Berechne die verstrichene Zeit
+                GameCompleted(currentPlayer);
+                currentPlayer.StopTimer();
+                currentPlayer.CalculateTime();
 
                 WonMessage();
-                players.Add(currentPlayer); // Den aktuellen Spieler zur Liste hinzufügen
+                players.Add(currentPlayer);
 
-                if (playerNumber < numberOfPlayer)
+                if (playerNumber < numberOfPlayers)
                 {
-                    Console.WriteLine("Weiter zum nächsten Spieler. Drücken Sie eine Taste, um fortzufahren...");
+                    Console.WriteLine("Continue to the next player. Press any key to continue...");
                     Console.ReadKey();
                     ResetGame();
                 }
             }
 
-            // Scoreboard anzeigen und Spielergebnisse anzeigen
             PlayerRanking(players);
         }
 
+
+        
         private static void ResetGame()
         {
             playerX = playerResetX;
             playerY = playerResetY;
             keyX = keyResetX;
             keyY = keyResetY;
-
             hasKey = false;
             isGameFinished = false;
         }
 
 
 
-        #region Begrüßung | Anleitung | Tastenbelegung
+        #region Welcome | Instructions | Controls
 
-        static void WelcomeMessage()
+        private static void WelcomeMessage()
         {
-
-            // Begrüßung
-            Console.WriteLine("Herzlich Willkommen!");
+            // Welcome
+            Console.WriteLine("Welcome!");
             Console.ReadKey();
             Console.Clear();
 
-            // Anleitung
-            Console.WriteLine("Anleitung");
-            Console.WriteLine("Bewege den Player (P) durch den Raum und sammle den Schlüssel (K) ein um den Raum durch die Tür (D) zu verlassen.");
+            // Instructions
+            Console.WriteLine("Instructions");
+            Console.WriteLine("Move the player (P) through the room, collect the key (K) to exit the room through the door (D).");
             Console.ReadKey();
             Console.Clear();
 
-            // Tastenbelegung
-            Console.WriteLine("Tastenbelegung");
-            Console.WriteLine("W|▲ = Hoch");
-            Console.WriteLine("A|◄ = Links");
-            Console.WriteLine("S|▼ = Runter");
-            Console.WriteLine("D|► = Rechts");
+            // Controls
+            Console.WriteLine("Controls");
+            Console.WriteLine("W|▲ = Up");
+            Console.WriteLine("A|◄ = Left");
+            Console.WriteLine("S|▼ = Down");
+            Console.WriteLine("D|► = Right");
             Console.ReadKey();
             Console.Clear();
-
-
         }
 
         #endregion
 
-        #region Anzahl der Spieler
+        #region Number of Players
 
-        static void NumberOfPlayer()
+        private static void NumberOfPlayers()
         {
-            Console.Write("Geben Sie die Anzahl der Spieler (max. 4) ein: ");
-            numberOfPlayer = Convert.ToInt32(Console.ReadLine());
-            numberOfPlayer = Math.Max(1, Math.Min(4, numberOfPlayer)); // Begrenzen auf 1 bis 4 Spieler
+            int minPlayers = 1;
+            int maxPlayers = 4;
+
+            while (true)
+            {
+                Console.Write($"Enter the number of players (between {minPlayers} and {maxPlayers}): ");
+                int input = Convert.ToInt32(Console.ReadLine());
+
+                if (input >= minPlayers && input <= maxPlayers)
+                {
+                    numberOfPlayers = input;
+                    break; // Exit the loop when input is valid
+                }
+                else
+                {
+                    Console.WriteLine("Oops... Something went wrong!");
+                    Console.WriteLine("Please enter a number between 1 and 4!");
+                    Console.ReadKey();
+                    Console.Clear();
+                }
+            }
         }
 
         #endregion
 
-        #region Name eingeben
+        #region Player Name
 
-        static void NameDeclaration(int playerNumber)
+        private static void NameDeclaration(int playerNumber)
         {
-            Console.Write($"Spieler {playerNumber}, geben Sie Ihren Namen ein: ");
-            PlayerName = Console.ReadLine();
+            Console.Write($"Player {playerNumber}, enter your name: ");
+            playerName = Console.ReadLine();
         }
-
-
-
 
         #endregion
 
-        #region Eingabe der Map Maße
+        #region Custom Map Dimensions
 
-        static void CustomMapCreation()
+        private static void CustomMapCreation()
         {
-            Console.Write("Geben Sie die Breite des Raums ein: ");
+            Console.Write("Enter the width of the room: ");
             roomWidth = Convert.ToInt32(Console.ReadLine());
 
-            Console.Write("Geben Sie die Hohe des Raums ein: ");
+            Console.Write("Enter the height of the room: ");
             roomHeight = Convert.ToInt32(Console.ReadLine());
 
             Console.Clear();
@@ -184,34 +148,25 @@ namespace Escape_Room_Kevin
 
         #endregion
 
-        #region Spielzeit berechnen
+        #region Player Ranking
 
-
-
-        #endregion
-
-        #region zeigt spieler Ranking an
-
-        static void PlayerRanking(List<PlayerInfo> players)
+        private static void PlayerRanking(List<PlayerInfo> players)
         {
             Console.WriteLine("Scoreboard:");
 
-            // Sortiere die Spieler nach der gemessenen Zeit (angenommen, PlayerInfo hat eine Eigenschaft "ElapsedTime" für die gemessene Zeit)
+            // Sort players by elapsed time
             players.Sort((player1, player2) => player1.ElapsedTime.CompareTo(player2.ElapsedTime));
 
-            // Zeige die Ergebnisse für jeden Spieler an
+            // Display results for each player
             for (int i = 0; i < players.Count; i++)
             {
-                Console.WriteLine($"Platz {i + 1}: {players[i].PlayerName} - Zeit: {players[i].ElapsedTime.ToString("mm':'ss'.'ff")}");
+                Console.WriteLine($"Position {i + 1}: {players[i].PlayerName} - Time: {players[i].ElapsedTime.ToString("mm':'ss'.'ff")}");
             }
-
-            // Du kannst hier auch andere Informationen anzeigen, je nachdem, was du erfasst hast.
         }
-
 
         #endregion
 
-        #region Spieler Info
+        #region Player Info
 
         public class PlayerInfo
         {
@@ -243,11 +198,9 @@ namespace Escape_Room_Kevin
 
         #endregion
 
+        #region Room Initialization
 
-
-        #region Map Aufbau
-
-        static void InitializeRoom()
+        private static void InitializeRoom()
         {
             map = new string[roomWidth, roomHeight];
 
@@ -257,43 +210,47 @@ namespace Escape_Room_Kevin
                 {
                     if (x == 0 || x == roomWidth - 1 || y == 0 || y == roomHeight - 1)
                     {
-                        map[x, y] = "██"; // Wand
+                        map[x, y] = "██";
                     }
                     else
                     {
-                        map[x, y] = "  "; // Boden
+                        map[x, y] = "  ";
                     }
                 }
             }
         }
 
-        static void DrawRoom()
+        #endregion
+
+        #region Room Drawing
+
+        private static void DrawRoom()
         {
             Console.SetCursorPosition(0, 0);
             Console.ForegroundColor = ConsoleColor.White;
 
             for (int y = 0; y < roomHeight; y++)
+            {
                 Console.ForegroundColor = ConsoleColor.White;
 
-            for (int y = 0; y < roomHeight; y++)
-            {
                 for (int x = 0; x < roomWidth; x++)
                 {
+                    // Überprüfe nur die Änderungen in der Karte
                     if (x == playerX && y == playerY)
                     {
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write(":)"); // Spielfigur
+                        Console.Write(":)");
                     }
                     else if (x == keyX && y == keyY)
                     {
                         if (!hasKey)
                         {
                             Console.ForegroundColor = ConsoleColor.Cyan;
-                            Console.Write("├o"); // Schlüssel
+                            Console.Write("├o");
                         }
                         else
                         {
-                            Console.Write("  "); // Schlüssel eingesammelt
+                            Console.Write("  ");
                         }
                     }
                     else if (x == doorX && y == doorY)
@@ -301,21 +258,29 @@ namespace Escape_Room_Kevin
                         if (hasKey)
                         {
                             Console.ForegroundColor = ConsoleColor.Green;
-                            Console.Write("░░"); // Tür geöffnet
-
+                            Console.Write("░░");
                         }
                         else
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
-                            Console.Write("▓▓"); // Verschlossene Tür
+                            Console.Write("▓▓");
                         }
                     }
                     else
                     {
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Console.Write(map[x, y]); // Boden oder Wand
+                        // Übertrage nur den alten Wert, wenn es keine Änderung gibt
+                        if (map[x, y] == "██")
+                        {
+                            Console.ForegroundColor = ConsoleColor.White;
+                            Console.Write("██");
+                        }
+                        else
+                        {
+                            Console.Write("  ");
+                        }
                     }
                 }
+
                 Console.WriteLine();
             }
 
@@ -324,9 +289,9 @@ namespace Escape_Room_Kevin
 
         #endregion
 
-        #region Spieler Platzieren
+        #region Place Player
 
-        static void PlacePlayer()
+        private static void PlacePlayer()
         {
             Random rnd = new Random();
             playerX = rnd.Next(1, roomWidth - 2);
@@ -338,9 +303,9 @@ namespace Escape_Room_Kevin
 
         #endregion
 
-        #region Spieler Bewegen
+        #region Player Movement
 
-        static void HandleInput(ConsoleKeyInfo keyInfo)
+        private static void HandleInput(ConsoleKeyInfo keyInfo)
         {
             int newPlayerX = playerX;
             int newPlayerY = playerY;
@@ -348,26 +313,18 @@ namespace Escape_Room_Kevin
             switch (keyInfo.Key)
             {
                 case ConsoleKey.UpArrow:
-                    newPlayerY--;
-                    break;
                 case ConsoleKey.W:
                     newPlayerY--;
                     break;
                 case ConsoleKey.RightArrow:
-                    newPlayerX++;
-                    break;
                 case ConsoleKey.D:
                     newPlayerX++;
                     break;
                 case ConsoleKey.DownArrow:
-                    newPlayerY++;
-                    break;
                 case ConsoleKey.S:
                     newPlayerY++;
                     break;
                 case ConsoleKey.LeftArrow:
-                    newPlayerX--;
-                    break;
                 case ConsoleKey.A:
                     newPlayerX--;
                     break;
@@ -392,7 +349,7 @@ namespace Escape_Room_Kevin
             }
         }
 
-        static bool IsValidMove(int x, int y)
+        private static bool IsValidMove(int x, int y)
         {
             if (x < 0 || x >= roomWidth || y < 0 || y >= roomHeight)
             {
@@ -407,7 +364,7 @@ namespace Escape_Room_Kevin
             return true;
         }
 
-        static void MovePlayer(int x, int y)
+        private static void MovePlayer(int x, int y)
         {
             map[playerX, playerY] = "  ";
             playerX = x;
@@ -417,9 +374,9 @@ namespace Escape_Room_Kevin
 
         #endregion
 
-        #region Schlüssel Platzieren
+        #region Place Key
 
-        static void PlaceKey()
+        private static void PlaceKey()
         {
             Random rnd = new Random();
             keyX = rnd.Next(1, roomWidth - 1);
@@ -431,39 +388,39 @@ namespace Escape_Room_Kevin
 
         #endregion
 
-        #region Schlüssel Aufnehmen
+        #region Collect Key
 
-        static void CollectKey()
+        private static void CollectKey()
         {
             hasKey = true;
             Beep();
-            keyX = -1; // Schlüssel verschwindet
+            keyX = -1; // Key disappears
         }
 
         #endregion
 
-        #region Tür Platzieren
+        #region Place Door
 
-        static void PlaceDoor()
+        private static void PlaceDoor()
         {
             Random rnd = new Random();
-            int side = rnd.Next(4); // 0: oben, 1: rechts, 2: unten, 3: links
+            int side = rnd.Next(4); // 0: top, 1: right, 2: bottom, 3: left
 
             switch (side)
             {
-                case 0: // oben
+                case 0: // top
                     doorX = rnd.Next(1, roomWidth - 1);
                     doorY = 0;
                     break;
-                case 1: // rechts
+                case 1: // right
                     doorX = roomWidth - 1;
                     doorY = rnd.Next(1, roomHeight - 1);
                     break;
-                case 2: // unten
+                case 2: // bottom
                     doorX = rnd.Next(1, roomWidth - 1);
                     doorY = roomHeight - 1;
                     break;
-                case 3: // links
+                case 3: // left
                     doorX = 0;
                     doorY = rnd.Next(1, roomHeight - 1);
                     break;
@@ -474,9 +431,9 @@ namespace Escape_Room_Kevin
 
         #endregion
 
-        #region Tür Öffnen
+        #region Open Door
 
-        static void OpenDoor()
+        private static void OpenDoor()
         {
             isGameFinished = true;
             Beep();
@@ -485,35 +442,35 @@ namespace Escape_Room_Kevin
             Console.Clear();
             DrawRoom();
             Console.Clear();
-            // Console.WriteLine("Glückwunsch! Du hast die Tür geöffnet und konntest den Raum verlassen!");
+            Console.WriteLine("Congratulations! You opened the door and escaped the room!");
             Console.ReadKey();
         }
 
         #endregion
 
-        #region Gewinner Nachricht
+        #region Winning Message
 
-        static void WonMessage()
+        private static void WonMessage()
         {
-            Console.WriteLine("Herzlichen Glückwunsch! Du hast die Tür geöffnet und konntest den Raum verlassen!");
+            Console.WriteLine("Congratulations! You opened the door and escaped the room!");
             Console.ReadKey();
             Console.Clear();
         }
 
         #endregion
 
-        #region BEEEEEEEP
+        #region Beep
 
-        static void Beep()
+        private static void Beep()
         {
             Console.Beep();
         }
 
         #endregion
 
-        #region Wenn das Spiel beendet wird
+        #region When the Game Ends
 
-        static void GameCompleted(PlayerInfo player)
+        private static void GameCompleted(PlayerInfo player)
         {
             while (!isGameFinished)
             {
@@ -528,7 +485,6 @@ namespace Escape_Room_Kevin
                 }
             }
         }
-
 
         #endregion
 
