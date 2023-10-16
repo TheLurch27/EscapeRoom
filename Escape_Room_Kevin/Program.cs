@@ -7,7 +7,7 @@ namespace Escape_Room_Kevin
         #region Deklaration
 
         private static int roomWidth, roomHeight, playerX, playerY, playerResetX, playerResetY, keyX, keyY, keyResetX, keyResetY, doorX, doorY, roomSize;
-        private static bool hasKey, isGameFinished;
+        private static bool hasKey, isGameFinished, isBeeping = true;
         private static string playerName = "";
         private static int numberOfPlayers;
         private static string[,] map;
@@ -21,6 +21,7 @@ namespace Escape_Room_Kevin
             WelcomeMessage();
             MainMenu();
         }
+
 
         #region Menu
         private static void MainMenu()
@@ -51,7 +52,7 @@ namespace Escape_Room_Kevin
                         ShowSettingsMenu();
                         break;
                     case '4':
-                        ShowScoreboard();
+                        //ShowScoreboard();
                         break;
                     case '5':
                         ExitGame();
@@ -129,7 +130,7 @@ namespace Escape_Room_Kevin
                 Console.WriteLine("Settings Menu:");
                 Console.WriteLine("1. Audio Settings");
                 Console.WriteLine("2. Key Settings");
-                Console.WriteLine("3. Back to Main Menu");
+                Console.WriteLine("B. Back to Main Menu");
                 Console.Write("Select an option: ");
 
                 char choice = Console.ReadKey().KeyChar;
@@ -143,7 +144,8 @@ namespace Escape_Room_Kevin
                     case '2':
                         ShowKeySettings();
                         break;
-                    case '3':
+                    case 'B':
+                    case 'b':
                         return;
                     default:
                         Console.WriteLine("Invalid option. Please select a valid option.");
@@ -155,35 +157,41 @@ namespace Escape_Room_Kevin
 
         private static void ShowAudioSettings()
         {
-            // Hier kannst du die Audioeinstellungen implementieren
-            // ...
-            Console.WriteLine("Audio Settings");
-            Console.WriteLine("1. Enable Beep Sound");
-            Console.WriteLine("2. Disable Beep Sound");
-            Console.WriteLine("B. Back to Settings Menu");
-            Console.Write("Select an option: ");
-            char choice = Console.ReadKey().KeyChar;
-            Console.WriteLine();
-
-            switch (choice)
+            while (true)
             {
-                // Implementiere die Audioeinstellungen hier
-                // ...
-                case 'B':
-                case 'b':
-                    return;
-                default:
-                    Console.WriteLine("Invalid option. Please select a valid option.");
-                    Console.ReadKey();
-                    ShowAudioSettings();
-                    break;
+                Console.Clear();
+                Console.WriteLine("Audio Settings");
+                Console.WriteLine("1. Enable Beep Sound");
+                Console.WriteLine("2. Disable Beep Sound");
+                Console.WriteLine("B. Back to Settings Menu");
+                Console.Write("Select an option: ");
+                char choice = Console.ReadKey().KeyChar;
+                Console.Clear();
+                switch (choice)
+                {
+                    case '1':
+                        isBeeping = true;
+                        Console.WriteLine("Änderung wurde übernommen.");
+                        Console.ReadKey();
+                        return;
+                    case '2':
+                        isBeeping = false;
+                        Console.WriteLine("Änderung wurde übernommen.");
+                        Console.ReadKey();
+                        return;
+                    case 'B':
+                    case 'b':
+                        return;
+                    default:
+                        Console.WriteLine("Invalid option. Please select a valid option.");
+                        Console.ReadKey();
+                        break;
+                } 
             }
         }
 
         private static void ShowKeySettings()
         {
-            // Hier kannst du die Tastenbelegungen implementieren
-            // ...
             Console.WriteLine("Key Settings");
             Console.WriteLine("W|▲ = Up");
             Console.WriteLine("A|◄ = Left");
@@ -196,8 +204,6 @@ namespace Escape_Room_Kevin
 
             switch (choice)
             {
-                // Implementiere die Tastenbelegungen hier
-                // ...
                 case 'B':
                 case 'b':
                     return;
@@ -213,52 +219,52 @@ namespace Escape_Room_Kevin
 
         #region Scoreboard [Menu]
 
-        private static void ShowScoreboard()
-        {
-            Console.Clear();
-            Console.WriteLine("Scoreboard:");
-            List<PlayerInfo> players = LoadScoreboard();
-            players.Sort((player1, player2) => player1.ElapsedTime.CompareTo(player2.ElapsedTime));
+        // private static void ShowScoreboard()
+        // {
+        //     Console.Clear();
+        //     Console.WriteLine("Scoreboard:");
+        //     List<PlayerInfo> players = LoadScoreboard();
+        //     players.Sort((player1, player2) => player1.ElapsedTime.CompareTo(player2.ElapsedTime));
+        // 
+        //     for (int i = 0; i < Math.Min(players.Count, 5); i++)
+        //     {
+        //         Console.WriteLine($"Position {i + 1}: {players[i].PlayerName} - Time: {players[i].ElapsedTime.ToString("mm':'ss'.'ff")}");
+        //     }
+        // 
+        //     Console.WriteLine("Press 'B' to go back to the Main Menu.");
+        //     while (Console.ReadKey().Key != ConsoleKey.B) ;
+        // }
 
-            for (int i = 0; i < Math.Min(players.Count, 5); i++)
-            {
-                Console.WriteLine($"Position {i + 1}: {players[i].PlayerName} - Time: {players[i].ElapsedTime.ToString("mm':'ss'.'ff")}");
-            }
-
-            Console.WriteLine("Press 'B' to go back to the Main Menu.");
-            while (Console.ReadKey().Key != ConsoleKey.B) ;
-        }
-
-        private static List<PlayerInfo> LoadScoreboard()
-        {
-            List<PlayerInfo> players = new List<PlayerInfo>();
-
-            try
-            {
-                using (StreamReader reader = new StreamReader("scoreboard.txt"))
-                {
-                    string line;
-                    while ((line = reader.ReadLine()) != null)
-                    {
-                        string[] parts = line.Split(':');
-                        if (parts.Length == 2)
-                        {
-                            string playerName = parts[0];
-                            if (TimeSpan.TryParse(parts[1], out TimeSpan elapsedTime))
-                            {
-                                players.Add(new PlayerInfo(playerName) { ElapsedTime = elapsedTime });
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                // Wenn das Lesen der Scoreboard-Datei fehlschlägt, wird eine leere Liste verwendet
-            }
-
-            return players;
-        }
+        // private static List<PlayerInfo> LoadScoreboard()
+        // {
+        //     List<PlayerInfo> players = new List<PlayerInfo>();
+        // 
+        //     try
+        //     {
+        //         using (StreamReader reader = new StreamReader("scoreboard.txt"))
+        //         {
+        //             string line;
+        //             while ((line = reader.ReadLine()) != null)
+        //             {
+        //                 string[] parts = line.Split(':');
+        //                 if (parts.Length == 2)
+        //                 {
+        //                     string playerName = parts[0];
+        //                     if (TimeSpan.TryParse(parts[1], out TimeSpan elapsedTime))
+        //                     {
+        //                         players.Add(new PlayerInfo(playerName) { ElapsedTime = elapsedTime });
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        //     catch (Exception)
+        //     {
+        //         // Wenn das Lesen der Scoreboard-Datei fehlschlägt, wird eine leere Liste verwendet
+        //     }
+        // 
+        //     return players;
+        // }
 
         private static void SaveScoreboard(List<PlayerInfo> players)
         {
@@ -370,6 +376,7 @@ namespace Escape_Room_Kevin
         {
             Console.Write($"Player {playerNumber}, enter your name: ");
             playerName = Console.ReadLine();
+            Console.Clear();
         }
 
         #endregion
@@ -700,7 +707,6 @@ namespace Escape_Room_Kevin
             Console.Clear();
             DrawRoom();
             Console.Clear();
-            Console.WriteLine("Congratulations! You opened the door and escaped the room!");
             Console.ReadKey();
         }
 
@@ -721,7 +727,10 @@ namespace Escape_Room_Kevin
 
         private static void Beep()
         {
-            Console.Beep();
+            if (isBeeping == true)
+            {
+                Console.Beep();
+            }
         }
 
         #endregion
