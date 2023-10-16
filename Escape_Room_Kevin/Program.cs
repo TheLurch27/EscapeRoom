@@ -114,6 +114,7 @@ namespace Escape_Room_Kevin
             Console.Clear();
             Console.WriteLine("Instructions:");
             Console.WriteLine("Move the player (P) through the room, collect the key (K) to exit the room through the door (D).");
+            Console.WriteLine();
             Console.WriteLine("Press 'B' to go back to the Main Menu.");
             Console.ReadKey();
         }
@@ -130,7 +131,8 @@ namespace Escape_Room_Kevin
                 Console.WriteLine("Settings Menu:");
                 Console.WriteLine("1. Audio Settings");
                 Console.WriteLine("2. Key Settings");
-                Console.WriteLine("B. Back to Main Menu");
+                Console.WriteLine("");
+                Console.WriteLine("Press 'B' to go back to the Main Menu.");
                 Console.Write("Select an option: ");
 
                 char choice = Console.ReadKey().KeyChar;
@@ -163,7 +165,8 @@ namespace Escape_Room_Kevin
                 Console.WriteLine("Audio Settings");
                 Console.WriteLine("1. Enable Beep Sound");
                 Console.WriteLine("2. Disable Beep Sound");
-                Console.WriteLine("B. Back to Settings Menu");
+                Console.WriteLine("");
+                Console.WriteLine("Press 'B' to go back to the Main Menu.");
                 Console.Write("Select an option: ");
                 char choice = Console.ReadKey().KeyChar;
                 Console.Clear();
@@ -192,12 +195,14 @@ namespace Escape_Room_Kevin
 
         private static void ShowKeySettings()
         {
+            Console.Clear();
             Console.WriteLine("Key Settings");
             Console.WriteLine("W|▲ = Up");
             Console.WriteLine("A|◄ = Left");
             Console.WriteLine("S|▼ = Down");
             Console.WriteLine("D|► = Right");
-            Console.WriteLine("B. Back to Settings Menu");
+            Console.WriteLine("");
+            Console.Write("Press 'B' to go back to the Main Menu.");
             Console.Write("Select an option: ");
             char choice = Console.ReadKey().KeyChar;
             Console.WriteLine();
@@ -352,11 +357,12 @@ namespace Escape_Room_Kevin
                 Console.Clear();
                 Console.Write($"Enter the number of players (between {minPlayers} and {maxPlayers}): ");
                 int input = Convert.ToInt32(Console.ReadLine());
+                Console.Clear();
 
                 if (input >= minPlayers && input <= maxPlayers)
                 {
                     numberOfPlayers = input;
-                    break; // Exit the loop when input is valid
+                    break; // Exit the loop when input is valid16
                 }
                 else
                 {
