@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using EscapeRoom_Kevin_Game;
 using EscapeRoom_Kevin;
+using EscapeRoom_Kevin_Room;
+using EscapeRoom_Kevin_Player;
 
 namespace EscapeRoom_Kevin_Menu
 {
@@ -39,7 +41,7 @@ namespace EscapeRoom_Kevin_Menu
                         ShowSettingsMenu();
                         break;
                     case '4':
-                        //ShowScoreboard();
+                        ShowScoreboard();
                         break;
                     case '5':
                         ExitGame();
@@ -176,17 +178,35 @@ namespace EscapeRoom_Kevin_Menu
         }
         #endregion
 
-        #region LoadScoreboard
-        public static List<Game.PlayerInfo> LoadScoreboard(string fileName)
+        #region ShowScoreboard
+        public static void ShowScoreboard()
         {
-            List<Game.PlayerInfo> players = new List<Game.PlayerInfo>();
+            Console.Clear();
+            Console.WriteLine("Scoreboard:");
+            List<Player.PlayerInfo> players = LoadScoreboard("scoreboard.json"); // Lade die Daten aus der JSON-Datei
+            players.Sort((player1, player2) => player1.ElapsedTime.CompareTo(player2.ElapsedTime));
+
+            for (int i = 0; i < Math.Min(players.Count, 5); i++)
+            {
+                Console.WriteLine($"Position {i + 1}: {players[i].PlayerName} - Time: {players[i].ElapsedTime.ToString("mm':'ss'.'ff")}");
+            }
+
+            Console.WriteLine("Press 'B' to go back to the Main Menu.");
+            while (Console.ReadKey().Key != ConsoleKey.B) ;
+        }
+        #endregion
+
+        #region LoadScoreboard
+        public static List<Player.PlayerInfo> LoadScoreboard(string fileName)
+        {
+            List<Player.PlayerInfo> players = new List<Player.PlayerInfo>();
 
             try
             {
                 if (File.Exists(fileName))
                 {
                     string json = File.ReadAllText(fileName);
-                    players = JsonConvert.DeserializeObject<List<Game.PlayerInfo>>(json);
+                    players = JsonConvert.DeserializeObject<List<Player.PlayerInfo>>(json);
                 }
             }
             catch (Exception)
@@ -195,6 +215,15 @@ namespace EscapeRoom_Kevin_Menu
             }
 
             return players;
+        }
+        #endregion
+
+        #region SaveScoreboard
+        public static void SaveScoreboard(List<PlayerInfo> players)
+        // Speichert "eigentlich" die Spielergebnisse in einer JSON-Datei (Bin aber zu doof dafür).
+        {
+            string json = JsonConvert.SerializeObject(players);
+            File.WriteAllText("scoreboard.json", json);
         }
         #endregion
 
@@ -210,7 +239,7 @@ namespace EscapeRoom_Kevin_Menu
             {
                 case 'J':
                 case 'j':
-                    Game.SaveScoreboard(); // Methode ohne Argument aufrufen
+                    SaveScoreboard(players); // Übergebe die players-Liste an die Methode
                     Environment.Exit(0);
                     break;
                 case 'N':
@@ -223,6 +252,7 @@ namespace EscapeRoom_Kevin_Menu
                     break;
             }
         }
+
         #endregion
 
     }
