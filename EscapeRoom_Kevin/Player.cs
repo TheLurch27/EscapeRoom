@@ -189,7 +189,7 @@ namespace EscapeRoom_Kevin_Player
                 Scoreboard.ScoreboardEntry entry = new Scoreboard.ScoreboardEntry
                 {
                     Name = playerInfo.PlayerName,
-                    Time = (int)playerInfo.ElapsedTime.TotalSeconds // Hier können Sie die Zeitkonvertierung anpassen
+                    Time = playerInfo.ElapsedTime // Hier können Sie die Zeitkonvertierung anpassen
                 };
                 entries.Add(entry);
             }
