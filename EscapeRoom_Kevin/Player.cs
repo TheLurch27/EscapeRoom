@@ -7,6 +7,7 @@ using EscapeRoom_Kevin_Room;
 using EscapeRoom_Kevin_Game;
 using EscapeRoom_Kevin_Menu;
 using EscapeRoom_Kevin;
+using EscapeRoom_Kevin_Scoreboard;
 
 namespace EscapeRoom_Kevin_Player
 {
@@ -134,7 +135,7 @@ namespace EscapeRoom_Kevin_Player
                     newPlayerX--;
                     break;
                 case ConsoleKey.Escape:
-                    Room.isGameFinished = true;
+                    Game.isGameFinished = true;
                     return;
             }
 
@@ -178,6 +179,23 @@ namespace EscapeRoom_Kevin_Player
         }
         #endregion
 
+        #region ConvertAndAddToScoreboard
+        public static void ConvertAndAddToScoreboard(List<PlayerInfo> playerInfos)
+        {
+            List<Scoreboard.ScoreboardEntry> entries = new List<Scoreboard.ScoreboardEntry>();
 
+            foreach (var playerInfo in playerInfos)
+            {
+                Scoreboard.ScoreboardEntry entry = new Scoreboard.ScoreboardEntry
+                {
+                    Name = playerInfo.PlayerName,
+                    Time = (int)playerInfo.ElapsedTime.TotalSeconds // Hier können Sie die Zeitkonvertierung anpassen
+                };
+                entries.Add(entry);
+            }
+
+            Scoreboard.SaveScoreboard(entries); // Speichern Sie die konvertierte Liste in der Scoreboard-Klasse
+        }
+        #endregion
     }
 }

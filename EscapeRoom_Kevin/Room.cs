@@ -7,6 +7,7 @@ using EscapeRoom_Kevin_Game;
 using EscapeRoom_Kevin_Menu;
 using EscapeRoom_Kevin_Player;
 using EscapeRoom_Kevin;
+using EscapeRoom_Kevin_Scoreboard;
 
 namespace EscapeRoom_Kevin_Room
 {
@@ -14,7 +15,7 @@ namespace EscapeRoom_Kevin_Room
     {
         public static int roomHeight, roomWidth, keyX, keyY, doorX, doorY, keyResetX, keyResetY, roomSize;
         public static string[,] map;
-        public static bool hasKey, isGameFinished;
+        public static bool hasKey;
 
 
         #region Room Drawing
@@ -173,7 +174,7 @@ namespace EscapeRoom_Kevin_Room
         public static void OpenDoor()
         //Spielt einen Sound ab, sobald der Spieler mit dem aufgenommenen Schlüssel, durch die Tür geht.
         {
-            isGameFinished = true;
+            Game.isGameFinished = true;
             Game.Beep();
             Game.Beep();
             Game.Beep();
