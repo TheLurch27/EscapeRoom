@@ -8,11 +8,13 @@ using EscapeRoom_Kevin;
 using EscapeRoom_Kevin_Room;
 using EscapeRoom_Kevin_Player;
 using Newtonsoft.Json;
+using EscapeRoom_Kevin_Scoreboard;
 
 namespace EscapeRoom_Kevin_Game
 {
     internal class Game
     {
+        public static bool isGameFinished;
         public static bool isBeeping = true;
 
         #region PlayGame
@@ -35,7 +37,7 @@ namespace EscapeRoom_Kevin_Game
                 Player.PlayerInfo currentPlayer = new Player.PlayerInfo(Player.playerName);
                 currentPlayer.StartTimer();
 
-                GameCompleted(Player.currentPlayer);
+                GameCompleted(currentPlayer);
                 currentPlayer.StopTimer();
                 currentPlayer.CalculateTime();
 
@@ -58,19 +60,19 @@ namespace EscapeRoom_Kevin_Game
         private static void InitializeRoom()
         // Berechnet die Wände und den Boden.
         {
-            map = new string[roomWidth, roomHeight];
+            Room.map = new string[Room.roomWidth, Room.roomHeight];
 
-            for (int x = 0; x < roomWidth; x++)
+            for (int x = 0; x < Room.roomWidth; x++)
             {
-                for (int y = 0; y < roomHeight; y++)
+                for (int y = 0; y < Room.roomHeight; y++)
                 {
-                    if (x == 0 || x == roomWidth - 1 || y == 0 || y == roomHeight - 1)
+                    if (x == 0 || x == Room.roomWidth - 1 || y == 0 || y == Room.roomHeight - 1)
                     {
-                        map[x, y] = "██";
+                        Room.map[x, y] = "██";
                     }
                     else
                     {
-                        map[x, y] = "  ";
+                        Room.map[x, y] = "  ";
                     }
                 }
             }
@@ -82,24 +84,27 @@ namespace EscapeRoom_Kevin_Game
         // fordert den Spieler auf seinen Namen einzutragen.
         {
             Console.Write($"Player {playerNumber}, enter your name: ");
-            playerName = Console.ReadLine();
+            Player.playerName = Console.ReadLine();
             Console.Clear();
         }
         #endregion
 
         #region GameCompleted
-        private static void GameCompleted(PlayerInfo player)
+        private static void GameCompleted(Player.PlayerInfo player)
         {
             while (!isGameFinished)
             {
-                DrawRoom();
+                Room.DrawRoom();
                 ConsoleKeyInfo keyInfo = Console.ReadKey(true);
-                HandleInput(keyInfo);
+                Player.HandleInput(keyInfo);
 
                 if (isGameFinished)
                 {
                     player.StopTimer();
                     player.CalculateTime();
+
+                    var scoreboardEntries = Scoreboard.ConvertToScoreboardEntries(Player.players);
+                    Scoreboard.SaveScoreboard(scoreboardEntries);
                 }
             }
         }
@@ -117,11 +122,11 @@ namespace EscapeRoom_Kevin_Game
         #region ResetGame
         private static void ResetGame()
         {
-            playerX = playerResetX;
-            playerY = playerResetY;
-            keyX = keyResetX;
-            keyY = keyResetY;
-            hasKey = false;
+            Player.playerX = Player.playerResetX;
+            Player.playerY = Player.playerResetY;
+            Room.keyX = Room.keyResetX;
+            Room.keyY = Room.keyResetY;
+            Room.hasKey = false;
             isGameFinished = false;
         }
         #endregion

@@ -8,6 +8,7 @@ using EscapeRoom_Kevin_Game;
 using EscapeRoom_Kevin;
 using EscapeRoom_Kevin_Room;
 using EscapeRoom_Kevin_Player;
+using EscapeRoom_Kevin_Scoreboard;
 
 namespace EscapeRoom_Kevin_Menu
 {
@@ -41,7 +42,17 @@ namespace EscapeRoom_Kevin_Menu
                         ShowSettingsMenu();
                         break;
                     case '4':
-                        ShowScoreboard();
+                        Console.Clear();
+                        var scoreboardEntries = Scoreboard.LoadScoreboard();
+                        Console.WriteLine("Scoreboard:");
+
+                        foreach (var entry in scoreboardEntries)
+                        {
+                            Console.WriteLine($"Name: {entry.Name}, Time: {entry.Time} seconds");
+                        }
+
+                        Console.WriteLine("\nPress any key to continue...");
+                        Console.ReadKey();
                         break;
                     case '5':
                         ExitGame();
@@ -57,7 +68,19 @@ namespace EscapeRoom_Kevin_Menu
         public static void WelcomeMessage()
         {
             // Welcome
-            Console.WriteLine("Welcome!");
+            Console.WriteLine(",------. ,---.   ,-----.  ,---.  ,------. ,------.    ,------.  ,-----.  ,-----. ,--.   ,--. ");
+            Console.WriteLine("|  .---''   .-' '  .--./ /  O  \\ |  .--. '|  .---'    |  .--. ''  .-.  ''  .-.  '|   `.'   | ");
+            Console.WriteLine("|  `--, `.  `-. |  |    |  .-.  ||  '--' ||  `--,     |  '--'.'|  | |  ||  | |  ||  |'.'|  | ");
+            Console.WriteLine("|  `---..-'    |'  '--'\\|  | |  ||  | --' |  `---.    |  |\\  \\ '  '-'  ''  '-'  '|  |   |  | ");
+            Console.WriteLine("`------'`-----'  `-----'`--' `--'`--'     `------'    `--' '--' `-----'  `-----' `--'   `--' ");
+            Console.WriteLine("");
+            Console.WriteLine("                                                                          ,--.   ,--.,--.      ,--.         ,------.   ,--.,--.  ,--.  ,--.                ");
+            Console.WriteLine("                                                                          |  |   |  |`--' ,---.|  ,---.     |  .---' ,-|  |`--',-'  '-.`--' ,---. ,--,--,  ");
+            Console.WriteLine("                                                                          |  |.'.|  |,--.(  .-'|  .-.  |    |  `--, ' .-. |,--.'-.  .-',--.| .-. ||      \\ ");
+            Console.WriteLine("                                                                          |   ,'.   ||  |.-'  `)  | |  |    |  `---.\\ `-' ||  |  |  |  |  |' '-' '|  ||  | ");
+            Console.WriteLine("                                                                          '--'   '--'`--'`----'`--' `--'    `------' `---' `--'  `--'  `--' `---' `--''--' ");
+            Console.ReadKey();
+            Console.Clear();
             Console.ReadKey();
             Console.Clear();
         }
@@ -179,52 +202,23 @@ namespace EscapeRoom_Kevin_Menu
         #endregion
 
         #region ShowScoreboard
-        public static void ShowScoreboard()
-        {
-            Console.Clear();
-            Console.WriteLine("Scoreboard:");
-            List<Player.PlayerInfo> players = LoadScoreboard("scoreboard.json"); // Lade die Daten aus der JSON-Datei
-            players.Sort((player1, player2) => player1.ElapsedTime.CompareTo(player2.ElapsedTime));
 
-            for (int i = 0; i < Math.Min(players.Count, 5); i++)
-            {
-                Console.WriteLine($"Position {i + 1}: {players[i].PlayerName} - Time: {players[i].ElapsedTime.ToString("mm':'ss'.'ff")}");
-            }
 
-            Console.WriteLine("Press 'B' to go back to the Main Menu.");
-            while (Console.ReadKey().Key != ConsoleKey.B) ;
-        }
         #endregion
 
         #region LoadScoreboard
-        public static List<Player.PlayerInfo> LoadScoreboard(string fileName)
-        {
-            List<Player.PlayerInfo> players = new List<Player.PlayerInfo>();
 
-            try
-            {
-                if (File.Exists(fileName))
-                {
-                    string json = File.ReadAllText(fileName);
-                    players = JsonConvert.DeserializeObject<List<Player.PlayerInfo>>(json);
-                }
-            }
-            catch (Exception)
-            {
-                // Wenn das Lesen der Scoreboard-Datei fehlschlägt, wird eine leere Liste verwendet
-            }
 
-            return players;
-        }
         #endregion
 
         #region SaveScoreboard
-        public static void SaveScoreboard(List<PlayerInfo> players)
-        // Speichert "eigentlich" die Spielergebnisse in einer JSON-Datei (Bin aber zu doof dafür).
+
+        public static void SaveScoreboard(List<Player.PlayerInfo> players)
         {
-            string json = JsonConvert.SerializeObject(players);
-            File.WriteAllText("scoreboard.json", json);
+            var scoreboardEntries = Scoreboard.ConvertToScoreboardEntries(players);
+            Scoreboard.SaveScoreboard(scoreboardEntries);
         }
+
         #endregion
 
         #region ExitGame
@@ -239,7 +233,13 @@ namespace EscapeRoom_Kevin_Menu
             {
                 case 'J':
                 case 'j':
-                    SaveScoreboard(players); // Übergebe die players-Liste an die Methode
+                    var players = Player.players;
+                    var scoreboardEntries = players.Select(playerInfo => new Scoreboard.ScoreboardEntry
+                    {
+                        Name = playerInfo.PlayerName,
+                        Time = (int)playerInfo.ElapsedTime.TotalSeconds
+                    }).ToList();
+                    Scoreboard.SaveScoreboard(scoreboardEntries);
                     Environment.Exit(0);
                     break;
                 case 'N':
