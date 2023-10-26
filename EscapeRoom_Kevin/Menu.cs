@@ -48,7 +48,7 @@ namespace EscapeRoom_Kevin_Menu
 
                         foreach (var entry in scoreboardEntries)
                         {
-                            Console.WriteLine($"Name: {entry.Name}, Time: {entry.Time} seconds");
+                            Console.WriteLine($"Name: {entry.Name}, Time: {entry.Time.ToString("mm':'ss'.'ff")}");
                         }
 
                         Console.WriteLine("\nPress any key to continue...");
@@ -237,7 +237,7 @@ namespace EscapeRoom_Kevin_Menu
                     var scoreboardEntries = players.Select(playerInfo => new Scoreboard.ScoreboardEntry
                     {
                         Name = playerInfo.PlayerName,
-                        Time = (int)playerInfo.ElapsedTime.TotalSeconds
+                        Time = playerInfo.ElapsedTime
                     }).ToList();
                     Scoreboard.SaveScoreboard(scoreboardEntries);
                     Environment.Exit(0);

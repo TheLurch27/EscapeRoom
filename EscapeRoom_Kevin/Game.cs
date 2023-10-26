@@ -37,12 +37,10 @@ namespace EscapeRoom_Kevin_Game
                 Player.PlayerInfo currentPlayer = new Player.PlayerInfo(Player.playerName);
                 currentPlayer.StartTimer();
 
+                Player.players.Add(currentPlayer);
                 GameCompleted(currentPlayer);
-                currentPlayer.StopTimer();
-                currentPlayer.CalculateTime();
 
                 WonMessage();
-                Player.players.Add(currentPlayer);
 
                 if (playerNumber < Player.numberOfPlayers)
                 {

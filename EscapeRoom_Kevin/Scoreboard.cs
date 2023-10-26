@@ -9,12 +9,14 @@ namespace EscapeRoom_Kevin_Scoreboard
     internal class Scoreboard
     {
         public class ScoreboardEntry
+        // Deklaration
         {
             public string Name { get; set; }
-            public int Time { get; set; }
+            public TimeSpan Time { get; set; }
         }
 
         public static List<ScoreboardEntry> ConvertToScoreboardEntries(List<PlayerInfo> playerInfos)
+        // 
         {
             List<ScoreboardEntry> scoreboardEntries = new List<ScoreboardEntry>();
 
@@ -23,7 +25,7 @@ namespace EscapeRoom_Kevin_Scoreboard
                 ScoreboardEntry entry = new ScoreboardEntry
                 {
                     Name = playerInfo.PlayerName,
-                    Time = (int)playerInfo.ElapsedTime.TotalSeconds // Hier können Sie die Zeit in Sekunden oder nach Bedarf konvertieren
+                    Time = playerInfo.ElapsedTime
                 };
                 scoreboardEntries.Add(entry);
             }
